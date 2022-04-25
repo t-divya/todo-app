@@ -8,13 +8,17 @@ const StyledUl = styled.ul`
   color: white;
   margin-right: 2px;
 `;
+const StyledButton = styled.button`
+  margin-right: 4px;
+  margin-left: 1px;
+`;
 
 export default function UserTable() {
   const userDetails = useSelector((state: RootState) => state.userDetails);
 
   // const value = useSelector((state: RootState) => state.userDetails.userName);
-  async function handleOnGetClick(item: string, i: number) {
-    await fetch(`/user?${item}`, {
+  async function handleOnGetClick(item: any) {
+    await fetch(`/user/${item}`, {
       method: "GET",
       mode: "cors",
       headers: {
@@ -24,9 +28,48 @@ export default function UserTable() {
     })
       .then((response) => response.json())
       .then((data) => {
-        console.log(data);
-        console.log("get data fetched", data[i].id);
-        // console.log("get data id fetched", data.id);
+        console.log("get data fetched", data);
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
+  }
+
+  async function handleOnDeleteClick(id: any) {
+    await fetch(`/user/${id}`, {
+      method: "DELETE",
+      mode: "cors",
+      headers: {
+        "content-type": "application/json",
+      },
+      cache: "default",
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log("get data fetched", data);
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
+  }
+
+  const myDataObject = {
+    username: "john",
+    email: "johndoe@gmail.com",
+  };
+
+  async function handleOnPutClick(id: any) {
+    await fetch(`/user/${id}`, {
+      method: "PUT",
+      mode: "cors",
+      headers: {
+        "content-type": "application/json",
+      },
+      body: JSON.stringify(myDataObject),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log("get data fetched", data);
       })
       .catch((error) => {
         console.error("Error:", error);
@@ -35,14 +78,25 @@ export default function UserTable() {
 
   return (
     <StyledUl>
-      {userDetails.map((item, i) => {
+      {userDetails.map((item) => {
         console.log(item);
         return (
           <li key={item.id.toString()}>
             {item.username}
-            <button onClick={() => handleOnGetClick(item.id.toString(), i)}>
-              GET id
-            </button>
+            <StyledButton onClick={() => handleOnGetClick(item.id)}>
+              Get
+            </StyledButton>
+            <span></span>
+            <StyledButton onClick={() => handleOnDeleteClick(item.id)}>
+              Delete
+            </StyledButton>
+            <StyledButton
+              onClick={() => {
+                handleOnPutClick(item.id);
+              }}
+            >
+              Put
+            </StyledButton>
           </li>
         );
       })}
